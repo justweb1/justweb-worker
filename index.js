@@ -1,12 +1,13 @@
-var firebase = require('firebase');
-var Queue = require('firebase-queue');
-var admin = require('firebase-admin');
+const firebase = require('firebase');
+const Queue = require('firebase-queue');
+const admin = require('firebase-admin');
+const nodemailer = require('nodemailer');
 
-var FIREBASE_ADMIN_KEY = {
+let FIREBASE_ADMIN_CERT = {
     // This information can be found in the Firebase project settings under Service Accounts. 
     // Select Node.js option and Generate New Key which will download a .json file. Use an existing
-    // file if you already have one. You can paste the contents of that .json file below or use them
-    // in the host as an Environment Variable.
+    // file if you already have one. You can paste the contents of that .json file below or use the
+    // information in the host as an Environment Variable.
     "type": "service_account", //default
     "project_id": "",
     "private_key_id": "",
@@ -19,14 +20,17 @@ var FIREBASE_ADMIN_KEY = {
     "client_x509_cert_url": ""
 };
 
-var serviceAccount = '.keys/justweb-89b40-firebase-adminsdk-noyc1-314e07ff65.json'; //TODO: Change to environment variable 'FIREBASE_ADMIN_KEY'
+let FIREBASE_DB_URL = "";
 
+//Initialize the application
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://justweb-89b40.firebaseio.com'
+  credential: admin.credential.cert(FIREBASE_ADMIN_CERT),
+  databaseURL: 'FIREBASE_DB_URL'
 });
 
-var sendContact = new Queue(
+// QUEUES
+
+let sendContact = new Queue(
     admin.database().ref('contact-form/submissions'), 
     function(data, progress, resolve, reject) {
   // Read and process task data
